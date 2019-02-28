@@ -46,7 +46,7 @@ for i = rem:S:size(img, 1)-5
                 
         m3 = mean(threeby);    
         v3 = var(threeby);
-        
+        % display 
         display(threeby)
         display(m3)
         display(v3)
