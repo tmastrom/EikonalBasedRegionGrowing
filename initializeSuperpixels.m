@@ -1,10 +1,11 @@
 
-function SPs = initializeSuperpixels(img, Seeds, State)
+function [SPs, Superpixels] = initializeSuperpixels(img, Seeds, State, Superpixels)
 
 v4x = [-1 0 1 0];   % 4connexity neighbourhood x 
 v4y = [0 1 0 -1];   % 4connexity neighbourhood y
 
 SPs = struct('x', 0, 'y', 0, 'meanColour', 0, 'count', 0); 
+
 % compute meanColour based on 4 connexity neighbourhood
 
 % create a vector of superpixels from the seeds 
@@ -29,9 +30,11 @@ for k=1:size(Seeds, 2)
            end
        end
    end
-   SPs(k).meanColour = mean(fourcon);   
+   SPs(k).meanColour = mean(fourcon); 
+   Superpixels(x,y) = SPs(k).meanColour;
 end
-    
+
+
 end
 
 

@@ -3,7 +3,7 @@
 % img = image matrix
 % SPs = superpixels vector  
 
-function fastMarch(Dist, Seeds, State, img, SPs)
+function fastMarch(Dist, Seeds, State, img, SPs, Superpixels)
 
 % initialize heap of ALIVE points
 HeapL = MinHeap(size(Seeds, 2));   %maximum elements is the number of seeds
@@ -46,6 +46,8 @@ while(ok == false)
            P = P + distanceAbs(SPs(k).meanColour, img(xx,yy));
            % how to relate point on heap to SPs????
            % combine all attributes into 1 struct?
+       end
+       
 end
 
 
