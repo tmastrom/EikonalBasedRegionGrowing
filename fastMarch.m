@@ -3,7 +3,7 @@
 % img = image matrix
 % SPs = superpixels vector  
 
-function fm2d(img, SPs)
+function fastMarch(img, SPs)
 
 W = size(img, 1);   % image height
 H = size(img, 2);   % image width

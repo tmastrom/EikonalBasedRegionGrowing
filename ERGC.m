@@ -4,28 +4,28 @@
 
 function ERGC(img, K)
 
-Seeds = -1*ones([size(img, 1), size(img, 2)]);      % initialize seeds img 
 Dist = 100000*ones([size(img, 1), size(img, 2)]);   % initialize distance map to FAR_AWAY 
+
 State = -1*ones([size(img, 1), size(img, 2)]);      % intialize State map to -1 FAR AWAY
 
-Seeds = placeSeedsOnGrid(img, K);
+% place seeds in a regular grid pattern
+Seeds = placeSeedsOnGrid(img, K); 
+% initialize Distance and State images
+[Dist, State] = initializeImages(Seeds, Dist, State);
 
-[Seeds, Dist, State] = initialize_images(img, K, Seeds, Dist, State);
+display(Seeds)
 
-figure('Name', 'Seeds')
-imshow(Seeds, [])
-
-figure('Name', 'Distance Map')
-imshow(Dist, [])
-
-figure('Name', 'State Map')
-imshow(State, [])
+% figure('Name', 'Distance Map2')
+% imshow(Dist, [])
+% 
+% figure('Name', 'State Map2')
+% imshow(State, [])
 
 
 % initialize superpixels
-SPs = initialize_superpixels(img, Seeds);
+SPs = initializeSuperpixels(img, Seeds, State);
 
-
+display(SPs)
 
 
 

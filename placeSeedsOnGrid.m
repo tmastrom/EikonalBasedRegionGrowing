@@ -1,7 +1,9 @@
-function [Seeds] = placeSeedsOnGrid(K, img)
+function [Seeds] = placeSeedsOnGrid(img, K)
 
-Seeds = struct('x',0,'y',0);
-seed_img = -1*ones([size(img, 1), size(img, 2)]);      % initialize seeds img 
+Seeds = struct('x',0,'y',0);      % x coord, ycoord, label: 0 = seed
+
+% initialize seeds img 
+seed_img = -1*ones([size(img, 1), size(img, 2)]); 
 
 W = size(img, 1);       % image height
 H = size(img, 2);       % image width
@@ -38,9 +40,9 @@ if step > H/2
 end
 
 n = 1;          % Seeds index Seeds(n)
-for y=0:ystrips
+for y=0:ystrips-1   %indexing issue w/o -1 
     ye = y*yerrperstrip;
-    for x=0:xstrips
+    for x=0:xstrips-1   % exceeds 256 w/o -1  
         xe = x*xerrperstrip;
         seed_img(round(x*step+xoff+xe),round(y*step+yoff+ye)) = 0;
         Seeds(n).x = round(x*step+xoff+xe);
@@ -49,10 +51,10 @@ for y=0:ystrips
     end
 end
 
+% number of seeds is not equal to K
+% 
+% figure('Name', 'Seed Img')
+% imshow(seed_img, [])
 
-
-figure('Name', 'Seed Img')
-imshow(seed_img, [])
-
-display(n)
+%display(Seeds)
 
