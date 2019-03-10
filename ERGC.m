@@ -16,6 +16,7 @@ Seeds = placeSeedsOnGrid(img, K);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % initialize Distance and State images
 Dist = 100000*ones([size(img, 1), size(img, 2)]);   
+
 % State map
 % -1 = FAR
 % 0 = ALIVE
