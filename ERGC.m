@@ -3,39 +3,45 @@
 % K = number of seeds 
 
 function ERGC(img, K)
+% initialize distance map to very far
+figure('Name', 'Input')
+imshow(img, [])
 
-Dist = 100000*ones([size(img, 1), size(img, 2)]);   % initialize distance map to FAR_AWAY 
-
-State = -1*ones([size(img, 1), size(img, 2)]);      % intialize State map to -1 FAR AWAY
-
-% place seeds in a regular grid pattern
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% initialize seeds in a grid 
 Seeds = placeSeedsOnGrid(img, K); 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % initialize Distance and State images
+Dist = 100000*ones([size(img, 1), size(img, 2)]);   
+
+% State map
+% -1 = FAR
+% 0 = ALIVE
+% 1 = COMPUTED
+State = -1*ones([size(img, 1), size(img, 2)]);      
+
 [Dist, State] = initializeImages(Seeds, Dist, State);
-
 display(Seeds)
-
-% figure('Name', 'Distance Map2')
-% imshow(Dist, [])
-% 
-% figure('Name', 'State Map2')
-% imshow(State, [])
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % initialize superpixels
-SPs = initializeSuperpixels(img, Seeds, State);
+Superpixels = zeros([size(img, 1), size(img, 2)]);
+[SPs, Superpixels] = initializeSuperpixels(img, Seeds, State, Superpixels);
+% display(SPs)
+figure('Name', 'Superpixels')
+imshow(Superpixels)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-display(SPs)
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% fastMarch(Dist, Seeds, State, img, SPs, Superpixels)
 
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-% fast marching algorithm (img, Seeds, Dist, States, SPs, m)
-% m is compacity value ??
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
 
