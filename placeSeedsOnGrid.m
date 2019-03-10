@@ -19,7 +19,7 @@ yerr = H - step*ystrips;
 if xerr < 0
     xstrips =  xstrips - 1;
     xerr = W-step*xstrips;
-end
+ends
 
 if yerr < 0
     ystrips = ystrips - 1;

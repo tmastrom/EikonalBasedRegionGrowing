@@ -3,32 +3,51 @@
 % img = image matrix
 % SPs = superpixels vector  
 
-function fastMarch(img, SPs)
-
-W = size(img, 1);   % image height
-H = size(img, 2);   % image width
-inf = 100000;       % infinity (large enough)
-
-v4x = [-1 0 1 0];   % 4connexity neighbourhood x 
-v4y = [0 1 0 -1];   % 4connexity neighbourhood y
-
-Sz = W*H/SPs;        % total number of pixels / number of seeds 
+function fastMarch(Dist, Seeds, State, img, SPs)
 
 % initialize heap of ALIVE points
-HeapL = MinHeap(SPs);   %maximum elements is the number of seeds
+HeapL = MinHeap(size(Seeds, 2));   %maximum elements is the number of seeds
 
-% add seeds to heap with tag ALIVE
+% for all p in img
+%   if p is a seed
+%       state = ALIVE, Dist = 0, add p to HeapL
+%   else 
+%       state= FAR, Dist = inf
+%   end
+% end
 
-for i = 1:W
-    for j = 1:H
-        % if p(i,j) is in SPs then add to the heap
-    end
+for i=1:size(Seeds, 2)
+    % add keys to list, should be sorted by Dist value but also
+    % need x,y coords 
+    %modify heap to handle structs and sort by Dist
+    HeapL.InsertKey(); 
+end
+HeapL.Sort();
+k = 1;          % Seeds index?
+bool ok = false;
+while(ok == false)
+% pop point off the heap (root)
+% pt = x,y
+% if State is not fixed 
+% if State(x,y) != -1
+%   State(x,y) = 1 
+%   update mean colour
+%   investigate neighbourhood (see init superpixels)
+    pt = HeapL.ExtractMin();
+    x = pt.x;
+    y = pt.y;
+    
+    fourcon = img(x,y);
+    for m = 1:4
+       xx = x+v4x(m);
+       yy = y+v4y(m);
+       if xx <= W && xx > 0 && yy > 0 && yy <= H
+           P = 0;
+           P = P + distanceAbs(SPs(k).meanColour, img(xx,yy));
+           % how to relate point on heap to SPs????
+           % combine all attributes into 1 struct?
 end
 
-fmm2d(distances, seeds, states, im, SPs, m);
 
-py.dict(pyargs('Robert',357,'Mary',229,'Joe',391))
 
-    // call to initialize_images function that initializes :
-    // - distances image
-    // - states image
+

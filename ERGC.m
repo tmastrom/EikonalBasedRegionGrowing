@@ -3,10 +3,15 @@
 % K = number of seeds 
 
 function ERGC(img, K)
+% initialize distance map to very far
+Dist = 100000*ones([size(img, 1), size(img, 2)]);   
+% State map
+% -1 = FAR
+% 0 = ALIVE
+% 1 = COMPUTED
+State = -1*ones([size(img, 1), size(img, 2)]);      
 
-Dist = 100000*ones([size(img, 1), size(img, 2)]);   % initialize distance map to FAR_AWAY 
 
-State = -1*ones([size(img, 1), size(img, 2)]);      % intialize State map to -1 FAR AWAY
 
 % place seeds in a regular grid pattern
 Seeds = placeSeedsOnGrid(img, K); 
@@ -31,8 +36,7 @@ display(SPs)
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-% fast marching algorithm (img, Seeds, Dist, States, SPs, m)
+% fastMarch(Dist, Seeds, State, img, SPs)
 % m is compacity value ??
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
