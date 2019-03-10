@@ -9,6 +9,7 @@ imshow(img, [0,255])    % display the image
 seeds = zeros([size(img, 1), size(img, 2)], 'uint8');   % initialize sees img
 
 N = size(img, 1)*size(img, 2);    % total image pixels 
+m = size(size(img);
 
 S = round(sqrt(N/K));      % seed interval
 %display(S)
