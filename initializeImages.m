@@ -6,6 +6,6 @@ for i=1:size(Seeds, 2)
     y = Seeds(i).y;
     
     Dist(x,y) = 0;  % Geodesic distance to seed = 0 
-    State(x,y) = 0; % 0 = ALIVE, 1 = COMPUTED, -1 = FARAWAY
+    State(x,y) = 0; % 0 = ALIVE, 1 = FAR AWAY, -1 = COMPUTED
 end
 

@@ -1,6 +1,6 @@
-function [Seeds] = placeSeedsOnGrid(img, K)
+function [Seeds, seed_img] = placeSeedsOnGrid(img, K)
 
-Seeds = struct('x',0,'y',0,'dist',-1,'state',-1);      % x coord, ycoord, label: 0 = seed
+Seeds = struct('x',0,'y',0,'dist',10000, 'label', 0);      % x coord, ycoord, label: 0 = seed
 
 % initialize seeds img 
 seed_img = -1*ones([size(img, 1), size(img, 2)]); 
@@ -50,6 +50,8 @@ for y=0:ystrips-1
         seed_img(round(x*step+xoff+xe),round(y*step+yoff+ye)) = 0;
         Seeds(n).x = round(x*step+xoff+xe);
         Seeds(n).y = round(y*step+yoff+ye);
+        Seeds(n).dist = 0;
+        Seeds(n).label = n; % number the seeds
         n = n + 1;
     end
 end

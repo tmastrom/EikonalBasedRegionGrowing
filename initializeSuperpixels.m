@@ -4,7 +4,8 @@ function [SPs, Superpixels] = initializeSuperpixels(img, Seeds, State, Superpixe
 v4x = [-1 0 1 0];   % 4connexity neighbourhood x 
 v4y = [0 1 0 -1];   % 4connexity neighbourhood y
 
-SPs = struct('x', 0, 'y', 0, 'meanColour', 0, 'count', 0, 'isAlive', false); 
+% xs,ys is the associated seed location
+SPs = struct('x', 0, 'y', 0, 'meanColour', 0, 'count', 0, 'isAlive', false, 'label',0); 
 
 % compute meanColour based on 4 connexity neighbourhood
 
@@ -17,6 +18,7 @@ for k=1:size(Seeds, 2)
    SPs(k).x = x;
    SPs(k).y = y;
    SPs(k).isAlive = true;
+   SPs(k).label = Seeds(k).label;   % links a superpixel to its seed 
    
 %    display(x)
 %    display(y)

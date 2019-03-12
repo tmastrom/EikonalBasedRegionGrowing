@@ -19,11 +19,11 @@ HeapL = MinHeap(size(Seeds, 2));   %maximum elements is the number of seeds
 for i=1:size(Seeds, 2)
     % add keys to list, should be sorted by Dist value but also
     % need x,y coords 
-    %modify heap to handle structs and sort by Dist
+    % modify heap to handle structs and sort by Dist
     HeapL.InsertKey(); 
 end
 HeapL.Sort();
-k = 1;          % Seeds index?
+
 bool ok = false;
 while(ok == false)
 % pop point off the heap (root)
