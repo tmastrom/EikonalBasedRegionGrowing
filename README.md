@@ -6,3 +6,6 @@ takes an image and a number of seeds, K, then places K seeds in a regular grid b
 
 ## dmc_to_png.m
 Iterates through all files in current directory. Program will read .dmc files and write them to .png format
+
+## contrast_enhance.m
+Performs a variety of contrast enhancement techniques on an input image, I. The original and enhanced images are displayed with their corresponding histogram.
