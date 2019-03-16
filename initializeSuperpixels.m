@@ -14,6 +14,7 @@ for k=1:size(Seeds, 2)
     
    x = Seeds(k).x;
    y = Seeds(k).y;
+   State(x,y) = -1;     % set state of the seed to COMPUTED
    
    SPs(k).x = x;
    SPs(k).y = y;
@@ -27,7 +28,7 @@ for k=1:size(Seeds, 2)
        xx = x+v4x(m);
        yy = y+v4y(m);
        if img(xx,yy)             % if the pixel is in the image 
-           if State(xx,yy)== -1  % if pixel state is not -1 Far Away
+           if State(xx,yy)== -1  % if pixel state is -1 not computed
                fourcon = [fourcon img(xx,yy)];
                SPs(k).count = SPs(k).count + 1; % increase count 
            end

@@ -10,7 +10,7 @@ length = 1;
 for k = 1:size(Seeds, 2)
     x = Seeds(k).x;
     y = Seeds(k).y;
-    n = Seeds(k).label;
+    n = Seeds(k).label;     % associate n with the seed 
 
     % init heap struct item and add struct to heapL struct array
     heapL(length).x = Seeds(k).x;
@@ -24,46 +24,55 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% main loop 
 % while there are items on the heap
 while(size(heapL) ~= 0)
     % pop the minimum item off the Heap
     %[x,y,n] = HeapL.pop()
     [item, heapL] = sortbystructfield(heapL);
-    x = item.x;
-    y = item.y;
-    n = item.n;
-    % sortbystructfield 
+    x = item.x; % x position
+    y = item.y; % y position
+    n = item.n; % associated seed
+    
     % if the point is not COMPUTED
     if State(x,y) ~= -1
         % Set State to COMPUTED
         State(x,y) = -1;
-        % update superpixel values
-        %SPs(n).meanColour = 
-        % iterate through superpixels 
-            % update mean colour 
-            % update count 
-            % add to superpixels map
-        end
+        
+        % update superpixel values using Eq.5
+        Ci = SPs(n).meanColour;
+        Ni = SPs(n).count;
+
+        Ci = (Ci*Ni + img(x,y))/(Ni+1); % update mean colour 
+        Ni = Ni + 1;                    % update count
+        SPs(n).meanColour = Ci;
+        SPs(n).count = Ni;
+        
+        % only updates the one pixel at current x,y 
+        % need to keep track of all the pixels that are part of a SP
+        % turn Superpixels into a cell array?
+        Superpixels(x,y) = Ci;
+    end
                 
-        % investigate 4-conn neighbourhood
-        fourcon = img(x,y);
-        for m = 1:4
-            xx = x+v4x(m);
-            yy = y+v4y(m);
-            
-            if img(xx,yy)             % if the pixel is in the image 
-                q = 0;
-                % compute the distance for pixels in the neighbourhood
-                q = q + computeDistance(img(xx,yy), SPs(n).meanColour);
+    % investigate 4-conn neighbourhood
+    fourcon = img(x,y);
+    for m = 1:4
+        xx = x+v4x(m);
+        yy = y+v4y(m);
+
+        if img(xx,yy)             % if the pixel is in the image 
+            q = 0;
+            % compute the distance for pixels in the neighbourhood
+            q = q + computeDistance(img(xx,yy), SPs(n).meanColour);
+
+            if State(xx,yy)== -1  % if pixel state is -1 NOT COMPUTED
+                % add to heapL
                 
-                
-                if State(xx,yy)== -1  % if pixel state is not -1 Far Away
-                    fourcon = [fourcon img(xx,yy)];
-                    SPs(n).count = SPs(n).count + 1; % increase count 
-                end
+ 
             end
         end
-    end
+        end   
+end
     
     
 end

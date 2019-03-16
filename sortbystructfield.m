@@ -18,7 +18,7 @@ Acell = reshape(Acell, sz(1), []);      % Px(MxN)
 Acell = Acell';                         % (MxN)xP
 
 % Sort by 4th field "distance"
-Acell = sortrows(Acell, 3)
+Acell = sortrows(Acell, 4)
 
 % Put back into original cell array format
 Acell = reshape(Acell', sz);
@@ -38,6 +38,5 @@ for i = 2:length(Asorted)
     fprintf('%d\n',i-1)
     disp(heapL(i-1))
 end
-
 
 % delete from array 
