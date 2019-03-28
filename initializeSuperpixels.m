@@ -28,8 +28,7 @@ for k=1:size(Seeds, 2)
        yy = y+v4y(m);
        if img(xx,yy)             % if the pixel is in the image 
            if State(xx,yy)~= -1  % if pixel state is not -1 = computed
-               fourcon = [fourcon img(xx,yy)];
-               SPs(k).count = SPs(k).count + 1; % increase count 
+               fourcon = [fourcon img(xx,yy)];               
            end
        end
    end
