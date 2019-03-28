@@ -1,26 +1,30 @@
-function fastMarchingAlg(Dist, Seeds, State, img, SPs, Superpixels)
+function [Superpixels] = fastMarchingAlg(Dist, Seeds, State, img, SPs, Superpixels, Seed_map)
 
-v4x = [-1 0 1 0];   % 4connexity neighbourhood x 
-v4y = [0 1 0 -1];   % 4connexity neighbourhood y
-heapL = struct('x', 0, 'y', 0, 'label',0 ,'dist', 0);
+% TODO 
+% set superpixels to the seed number 
+% make superpixel map corresponding to the seed number 
+% at the end of fast marching set all sps in map to the mean value 
+W = size(img, 1);       % image height
+H = size(img, 2);       % image width
+heapL = struct('x', 0, 'y', 0, 'label',1 ,'dist', 0);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Initialize the Heap with seeds
 length = 1;
 for k = 1:size(Seeds, 2)
-    x = Seeds(k).x;
-    y = Seeds(k).y;
-    n = Seeds(k).label;     % associate n with the seed 
+    x = double(Seeds(k).x);
+    y = double(Seeds(k).y);
+    n = double(Seeds(k).label);     % associate n with the seed 
 
     % init heap struct item and add struct to heapL struct array
-    heapL(length).x = Seeds(k).x;
-    heapL(length).y = Seeds(k).y;
-    heapL(length).label = Seeds(k).label;
-    heapL(length).dist = 0;
+    heapL(length).x = x;
+    heapL(length).y = y;
+    heapL(length).label = n;
+    heapL(length).dist = double(0);
     
+    % is length necessary? just use k?
     length = length + 1;
-    
-end   
+end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -29,21 +33,28 @@ end
 while(size(heapL) ~= 0)
     % pop the minimum item off the Heap
     %[x,y,n] = HeapL.pop()
-    [item, heapL] = sortbystructfield(heapL);
+    [item, heapL, len] = sortbystructfield(heapL);
+    fprintf('new item from heap\n');
+    
     x = item.x; % x position
     y = item.y; % y position
-    n = item.n; % associated seed
+    n = item.label; % associated seed
+    fprintf('label n: %d \n', n);
+    SPs(n)
     
     % if the point is not COMPUTED
+    % point is not fixed 
     if State(x,y) ~= -1
         % Set State to COMPUTED
         State(x,y) = -1;
         
         % update superpixel values using Eq.5
-        Ci = SPs(n).meanColour;
-        Ni = SPs(n).count;
+        Ci = double(SPs(n).meanColour);
+        fprintf('current mean colour %d \n',Ci); 
+        Ni = double(SPs(n).count);
 
-        Ci = (Ci*Ni + img(x,y))/(Ni+1); % update mean colour 
+        Ci = (Ci*Ni + double(img(x,y)))/(Ni+1); % update mean colour 
+        fprintf('new mean colour %d \n', Ci);
         Ni = Ni + 1;                    % update count
         SPs(n).meanColour = Ci;
         SPs(n).count = Ni;
@@ -51,31 +62,87 @@ while(size(heapL) ~= 0)
         % only updates the one pixel at current x,y 
         % need to keep track of all the pixels that are part of a SP
         % turn Superpixels into a cell array?
-        Superpixels(x,y) = Ci;
-    end
-                
-    % investigate 4-conn neighbourhood
-    fourcon = img(x,y);
-    for m = 1:4
-        xx = x+v4x(m);
-        yy = y+v4y(m);
+        Superpixels(x,y) = n; % add pixel to superpixel map with intensity 'label' 
 
-        if img(xx,yy)             % if the pixel is in the image 
-            q = 0;
-            % compute the distance for pixels in the neighbourhood
-            q = q + computeDistance(img(xx,yy), SPs(n).meanColour);
-
-            if State(xx,yy)== -1  % if pixel state is -1 NOT COMPUTED
-                % add to heapL
-                
- 
+ %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        % investigate 4-conn neighbourhood to find the next closest pixel 
+        % if the pixel is in the image 
+        if x+1<=W
+            right = computeDistance(double(img(x+1,y)), double(Ci));
+            fprintf('right %d \n', right)
+            closest = 'right';
+            d = right;
+            xnew = x+1; ynew = y;
+        end
+        if x-1>0
+            left = computeDistance(double(img(x-1,y)), double(Ci));
+            fprintf('left %d \n', left)
+            if left <= d
+                closest = 'left';
+                d = left;
+                xnew = x-1; ynew = y;
+            end
+        end      
+        if y+1<=H
+            up = computeDistance(double(img(x,y-1)), double(Ci));
+            fprintf('up %d \n', up)
+            if up <= d
+                closest = 'up';
+                d = up;
+                xnew = x; ynew = y-1;
             end
         end
-        end   
-end
+        
+        if y-1>0
+            down = computeDistance(double(img(x,y+1)), double(Ci));
+            fprintf('down %d \n', down)
+            if down <= d
+                closest = 'down';
+                d = down;
+                xnew = x; ynew = y+1;
+            end
+        end
+        
+        % distance = the next distance
+        % closest = the direction of the next closest pixel 
+ 
+        if State(xnew,ynew) == 0    % if its a seed 
+            % i dunno what to do here
+            fprintf('it was a seed \n')
+        end
+        
+        if State(xnew,ynew) == 1    % if its not a seed
+            fprintf('x %d \n', xnew);
+            fprintf('y %d \n', ynew);
+            fprintf('length %d \n', len);
+            % add to the heap list             
+            heapL(len +1).x = double(xnew);
+            heapL(len +1).y = double(ynew);
+            heapL(len +1).label = double(n);
+            fprintf('dist: %d \n', d)
+            heapL(len +1).dist = double(d);
+            %length = length + 1;
+            % update superpixel map 
+            Superpixels(xnew,ynew) = n;
+        end    
+    end
     
-    
+end   
+
+mean_map = 255*ones([size(img, 1), size(img, 2)]);
+imshow(Superpixels, [1, 5])
+
+for q = 1:W
+    for p = 1:H
+        ind = Superpixels(q,p);
+        %fprintf('index %d\n',ind);
+        mean_map(q,p) = uint8(SPs(ind).meanColour);
+        
+    end
 end
+figure('Name','Mean Colour Map');
+imshow(mean_map, []);
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
