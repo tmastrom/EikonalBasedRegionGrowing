@@ -7,6 +7,7 @@ function [Superpixels] = fastMarchingAlg(Dist, Seeds, State, img, SPs, Superpixe
 W = size(img, 1);       % image height
 H = size(img, 2);       % image width
 heapL = struct('x', 0, 'y', 0, 'label',1 ,'dist', 0);
+INF = 100000;   % infinity value 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Initialize the Heap with seeds
@@ -69,72 +70,105 @@ while(size(heapL) ~= 0)
 
  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         % investigate 4-conn neighbourhood to find the next closest pixel 
-        % if the pixel is in the image 
-        if x+1<=W
-            right = computeDistance(double(img(x+1,y)), double(Ci));
-            fprintf('right %d \n', right)
-            closest = 'right';
-            d = right;
-            xnew = x+1; ynew = y;
-        end
-        if x-1>0
-            left = computeDistance(double(img(x-1,y)), double(Ci));
-            fprintf('left %d \n', left)
-            if left <= d
-                closest = 'left';
-                d = left;
-                xnew = x-1; ynew = y;
-            end
-        end      
-        if y+1<=H
-            up = computeDistance(double(img(x,y-1)), double(Ci));
-            fprintf('up %d \n', up)
-            if up <= d
-                closest = 'up';
-                d = up;
-                xnew = x; ynew = y-1;
-            end
-        end
         
-        if y-1>0
-            down = computeDistance(double(img(x,y+1)), double(Ci));
-            fprintf('down %d \n', down)
-            if down <= d
-                closest = 'down';
-                d = down;
-                xnew = x; ynew = y+1;
-            end
-        end
         
-        fprintf('the closest direction is %s\n', closest)
-        % distance = the next distance
-        % closest = the direction of the next closest pixel 
- 
-        if State(xnew,ynew) == 0    % if its a seed 
-            % i dunno what to do here
-            fprintf('it was a seed \n')
-        end
-        
-        if State(xnew,ynew) == 0    % if ALIVE
-            fprintf('xnew %d \n', xnew);
-            fprintf('ynew %d \n', ynew);
-            fprintf('length %d \n', len);
-            % add to the heap list             
-            heapL(len +1).x = double(xnew);
-            heapL(len +1).y = double(ynew);
-            heapL(len +1).label = double(n);
-            fprintf('dist: %d \n', d)
-            heapL(len +1).dist = double(d);
-            %length = length + 1;
-            % update superpixel map 
-            Superpixels(xnew,ynew) = n;
+        v4x = [-1 0 1 0];   % 4connexity neighbourhood x 
+        v4y = [0 1 0 -1];   % 4connexity neighbourhood y
+        for m = 1:4
+            xx = x+v4x(m);
+            yy = y+v4y(m);
+            fprintf('xx = %d \n',xx);
+            fprintf('yy = %d \n',yy);
             
-            %figure()
-            %imshow(Superpixels, []);
-        end    
+            % if the pixel is in the image 
+            if xx<W && xx>0 && yy<=H && yy>0
+                P = 0;
+                for c = 1:255
+                    P = P + computeDistance(double(Ci), double(img(xx,yy)));
+                end
+                fprintf('P = %d \n',P);
+                
+                a1 = INF;
+                if xx<W
+                    a1 = Dist(xx+1, yy);
+                end 
+                if xx>1
+                    a11 = Dist(xx-1, yy);
+                    if a11 < a1
+                        a1 = a11; 
+                    end       
+                end
+                
+                a2 = INF;
+                if yy<H
+                    a2 = Dist(xx, yy+1);
+                end
+                if yy>1
+                    a22 = Dist(xx, yy-1);
+                    if a22 < a2
+                        a2 = a22;
+                    end
+                end
+                
+                if a1 > a2
+                    tmp = a1;
+                    a1 = a2;
+                    a2 = tmp;
+                end
+                
+                A1 = 0;
+                if P*P > (a2-a1)*(a2-a1)
+                    fprintf('P*P > (a2-a1)^2 \n');
+                    delta = 2*P*P-(a2-a1)*(a2-a1);
+                    A1 = (a1+a2+sqrt(delta))/2;
+                else
+                    fprintf('P*P < (a2-a1)^2 \n');
+                    A1 = a1 + P;
+                end
+                
+                if State(xx,yy) == 0
+                    if A1<Dist(xx,yy)
+                        fprintf('State = 0, A1<Dist\n');
+                        Dist(xx,yy) = A1;
+                        
+                        heapL(len +1).x = double(xx);
+                        heapL(len +1).y = double(yy);
+                        heapL(len +1).label = double(n);
+                        
+                        %fprintf('dist: %d \n', d)
+                        heapL(len +1).dist = double(A1);
+                        % update superpixel map 
+                        Superpixels(xx,yy) = n;
+                    end
+                    
+                else
+                    if State(xx,yy) == 1
+                        % add a new point
+                        fprintf('State = 1\n')
+                        State(xx,yy) = 0;
+                        Dist(xx,yy) = A1;
+%                         fprintf('Dist(xx,yy) = %d \n',Dist(xx,yy));
+%                         fprintf('A1 = %d \n',A1);
+%                         fprintf('double(A1) = %d \n',double(A1));
+
+                        heapL(len +1).x = double(xx);
+                        heapL(len +1).y = double(yy);
+                        heapL(len +1).label = double(n);
+                        heapL(len +1).dist = A1;
+                        heapL(len +1)
+                        Superpixels(xx,yy) = n;
+                       
+                    end
+                    
+                end
+
+            end
+
+        end
     end
     
-end   
+
+end
 
 mean_map = 255*ones([size(img, 1), size(img, 2)]);
 imshow(Superpixels, [1, 5])
@@ -149,6 +183,8 @@ for q = 1:W
 end
 figure('Name','Mean Colour Map');
 imshow(mean_map, []);
+figure('Name','Distance Map');
+imshow(Dist, []);
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

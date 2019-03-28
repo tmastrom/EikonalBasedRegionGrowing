@@ -4,7 +4,7 @@ function [minimum, heapL, len] = sortbystructfield(A)
 
 for id = 1:length(A)
     fprintf('%d\n',id)
-    disp(A(id))
+    %disp(A(id))
 end
 
 Afields = fieldnames(A);

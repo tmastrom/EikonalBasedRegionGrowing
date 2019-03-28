@@ -3,6 +3,9 @@
 % K = number of seeds 
 
 function ERGC(img, K)
+
+close all
+
 % initialize distance map to very far
 figure('Name', 'Input')
 imshow(img, [])
