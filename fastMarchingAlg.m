@@ -1,9 +1,9 @@
 function [Superpixels] = fastMarchingAlg(Dist, Seeds, State, img, SPs, Superpixels, Seed_map)
 
 % TODO 
-% set superpixels to the seed number 
-% make superpixel map corresponding to the seed number 
-% at the end of fast marching set all sps in map to the mean value 
+% Indexing issue in x direction, img(16,y) not visited 
+
+
 W = size(img, 1);       % image height
 H = size(img, 2);       % image width
 heapL = struct('x', 0, 'y', 0, 'label',1 ,'dist', 0);
@@ -79,10 +79,10 @@ while(size(heapL) ~= 0)
 %             fprintf('yy = %d \n',yy);
 %             
             % if the pixel is in the image 
-            if xx<W && xx>0 && yy<=H && yy>0
+            if xx<=W && xx>0 && yy<=H && yy>0
                 P = 0;
-                for c = 1:256
-                    P = P + computeDistance(double(Ci), double(img(xx,yy)));
+                for c = 1:int8(Ci)
+                    P = P + computeDistance(double(c), double(img(xx,yy)));
                 end
                 %fprintf('P = %d \n',P);
                 
@@ -124,17 +124,20 @@ while(size(heapL) ~= 0)
                     A1 = a1 + P;
                 end
                 
+                % update heap len value 
+                heap_len = size(heapL, 2); 
+                
                 if State(xx,yy) == 0
                     if A1<Dist(xx,yy)
                         fprintf('State = 0, A1<Dist\n');
                         Dist(xx,yy) = A1;
                         
-                        heapL(len +1).x = double(xx);
-                        heapL(len +1).y = double(yy);
-                        heapL(len +1).label = double(n);
+                        heapL(heap_len +1).x = double(xx);
+                        heapL(heap_len +1).y = double(yy);
+                        heapL(heap_len +1).label = double(n);
                         
                         %fprintf('dist: %d \n', d)
-                        heapL(len +1).dist = double(A1);
+                        heapL(heap_len +1).dist = double(A1);
                         % update superpixel map 
                         Superpixels(xx,yy) = n;
                     end
@@ -148,13 +151,16 @@ while(size(heapL) ~= 0)
 %                         fprintf('Dist(xx,yy) = %d \n',Dist(xx,yy));
 %                         fprintf('A1 = %d \n',A1);
 %                         fprintf('double(A1) = %d \n',double(A1));
+                        heapL(heap_len +1).x = double(xx);
+                        heapL(heap_len +1).y = double(yy);
+                        heapL(heap_len +1).label = double(n);
+                        
+                        %fprintf('dist: %d \n', d)
+                        heapL(heap_len +1).dist = double(A1);
 
-                        heapL(len +1).x = double(xx);
-                        heapL(len +1).y = double(yy);
-                        heapL(len +1).label = double(n);
-                        heapL(len +1).dist = A1;
-                        heapL(len +1)
                         Superpixels(xx,yy) = n;
+                        figure(2)
+                        imshow(Superpixels, [], 'InitialMagnification' ,'fit');
                        
                     end
                     
@@ -169,20 +175,33 @@ while(size(heapL) ~= 0)
 end
 
 mean_map = 256*ones([size(img, 1), size(img, 2)]);
-imshow(Superpixels, [])
+figure(2)
+imshow(Superpixels, [], 'InitialMagnification' ,'fit')
 
 for q = 1:W
     for p = 1:H
         ind = Superpixels(q,p);
         %fprintf('index %d\n',ind);
+        %if ind <= max(size(SPs))
+            
         mean_map(q,p) = uint8(SPs(ind).meanColour);
+        %else 
+            %disp('not associated with a Superpixel')
+        %end
+        
         
     end
 end
-figure('Name','Mean Colour Map');
-imshow(mean_map, []);
-figure('Name','Distance Map');
-imshow(Dist, []);
+figure(1)
+subplot(2,2,3)
+imshow(mean_map, [1, 255], 'InitialMagnification' ,'fit');
+title('Mean Colour Map')
+
+figure(1)
+subplot(2,2,4)
+Dist = Dist/1e5;
+imshow(Dist, [], 'InitialMagnification' ,'fit');
+title('Distance Map')
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

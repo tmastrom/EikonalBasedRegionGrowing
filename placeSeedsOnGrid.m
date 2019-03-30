@@ -58,8 +58,5 @@ end
 
 % number of seeds is not equal to K
 % 
-figure('Name', 'Seed Img')
-imshow(seed_img, [])
 
-%display(Seeds)
 
