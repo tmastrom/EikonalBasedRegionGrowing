@@ -33,7 +33,7 @@ end
 % while there are items on the heap
 while(size(heapL) ~= 0)
     % pop the minimum item off the Heap
-    %[x,y,n] = HeapL.pop()
+    
     [item, heapL, len] = sortbystructfield(heapL);
     fprintf('new item from heap\n');
     
@@ -43,7 +43,7 @@ while(size(heapL) ~= 0)
     fprintf('label n: %d \n', n);
     SPs(n)
     
-    % if the point is not COMPUTED or a SEED
+    % if the point is not COMPUTED
     % point is not fixed 
     if State(x,y) ~= -1      
         % Set State to COMPUTED
@@ -51,11 +51,11 @@ while(size(heapL) ~= 0)
         
         % update superpixel values using Eq.5
         Ci = double(SPs(n).meanColour);
-        fprintf('current mean colour %d \n',Ci); 
+        %fprintf('current mean colour %d \n',Ci); 
         Ni = double(SPs(n).count);
 
         Ci = (Ci*Ni + double(img(x,y)))/(Ni+1); % update mean colour 
-        fprintf('new mean colour %d \n', Ci);
+        %fprintf('new mean colour %d \n', Ci);
         if Seed_map(x,y) ~= 0   % update count if not a seed
             Ni = Ni + 1; 
         end
@@ -69,24 +69,22 @@ while(size(heapL) ~= 0)
         Superpixels(x,y) = n; % add pixel to superpixel map with intensity 'label' 
 
  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        % investigate 4-conn neighbourhood to find the next closest pixel 
-        
-        
+        % investigate 4-conn neighbourhood to find the next closest pixel         
         v4x = [-1 0 1 0];   % 4connexity neighbourhood x 
         v4y = [0 1 0 -1];   % 4connexity neighbourhood y
         for m = 1:4
             xx = x+v4x(m);
             yy = y+v4y(m);
-            fprintf('xx = %d \n',xx);
-            fprintf('yy = %d \n',yy);
-            
+%             fprintf('xx = %d \n',xx);
+%             fprintf('yy = %d \n',yy);
+%             
             % if the pixel is in the image 
             if xx<W && xx>0 && yy<=H && yy>0
                 P = 0;
-                for c = 1:255
+                for c = 1:256
                     P = P + computeDistance(double(Ci), double(img(xx,yy)));
                 end
-                fprintf('P = %d \n',P);
+                %fprintf('P = %d \n',P);
                 
                 a1 = INF;
                 if xx<W
@@ -118,11 +116,11 @@ while(size(heapL) ~= 0)
                 
                 A1 = 0;
                 if P*P > (a2-a1)*(a2-a1)
-                    fprintf('P*P > (a2-a1)^2 \n');
+                    %fprintf('P*P > (a2-a1)^2 \n');
                     delta = 2*P*P-(a2-a1)*(a2-a1);
                     A1 = (a1+a2+sqrt(delta))/2;
                 else
-                    fprintf('P*P < (a2-a1)^2 \n');
+                    %fprintf('P*P < (a2-a1)^2 \n');
                     A1 = a1 + P;
                 end
                 
@@ -144,7 +142,7 @@ while(size(heapL) ~= 0)
                 else
                     if State(xx,yy) == 1
                         % add a new point
-                        fprintf('State = 1\n')
+                        %fprintf('State = 1\n')
                         State(xx,yy) = 0;
                         Dist(xx,yy) = A1;
 %                         fprintf('Dist(xx,yy) = %d \n',Dist(xx,yy));
@@ -170,8 +168,8 @@ while(size(heapL) ~= 0)
 
 end
 
-mean_map = 255*ones([size(img, 1), size(img, 2)]);
-imshow(Superpixels, [1, 5])
+mean_map = 256*ones([size(img, 1), size(img, 2)]);
+imshow(Superpixels, [])
 
 for q = 1:W
     for p = 1:H

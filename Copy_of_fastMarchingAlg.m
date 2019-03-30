@@ -27,6 +27,14 @@ for k = 1:size(Seeds, 2)
 end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+% for each seed 
+%     for each pixel in the image 
+%       compute the distance 
+%     add to list 
+%     add to SP region based on a threshold 
+%     display the region
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % main loop 
 % while there are items on the heap

@@ -6,7 +6,7 @@ function ERGC(img, K)
 
 close all
 
-% initialize distance map to very far
+
 figure('Name', 'Input')
 imshow(img, [])
 W = size(img, 1);       % image height
