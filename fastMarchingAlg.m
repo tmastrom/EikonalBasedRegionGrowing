@@ -12,6 +12,8 @@ INF = 100000;   % infinity value
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Initialize the Heap with seeds
 length = 1;
+num_seeds = size(Seeds, 2);
+
 for k = 1:size(Seeds, 2)
     xs = double(Seeds(k).x);
     ys = double(Seeds(k).y);
@@ -35,7 +37,7 @@ end
 %thresh = 2500; % max difference = 50 values
 %thresh = 3600; % max difference = 60 values
 %thresh = 1600; % max difference = 40 values    
-thresh = 900;
+thresh = 200;
 
 while(size(heapL) ~= 0)
     % pop the minimum item off the Heap
@@ -147,8 +149,9 @@ while(size(heapL) ~= 0)
           
             end
             
-            figure(3)  
-            imshow(Dist, [1, 4000], 'InitialMagnification' ,'fit');
+            % live update the state map
+            figure(2)  
+            imshow(State, [], 'InitialMagnification' ,'fit');
   
         end
 
@@ -158,8 +161,8 @@ end
     
 
 mean_map = 256*ones([size(img, 1), size(img, 2)]);
-figure('Name','Superpixels')
-imshow(Superpixels, [1, 12], 'InitialMagnification' ,'fit')
+% figure('Name','Superpixels')
+% imshow(Superpixels, [1, 12], 'InitialMagnification' ,'fit')
 
 
 for q = 1:W
@@ -176,16 +179,26 @@ for q = 1:W
         
     end
 end
+
+figure('Name','Mean Colour Map')
+imshow(mean_map, [1, 255], 'InitialMagnification' ,'fit');
+
 figure(1)
 subplot(2,2,3)
-imshow(mean_map, [1, 255], 'InitialMagnification' ,'fit');
-title('Mean Colour Map')
+imshow(Superpixels, [1, num_seeds], 'InitialMagnification' ,'fit')
+title('Superpixels')
 
 figure(1)
 subplot(2,2,4)
 Dist = Dist/1e5;
 imshow(Dist, [], 'InitialMagnification' ,'fit');
 title('Distance Map')
+
+imwrite(mean_map, 'Mean_map.jpg')
+
+% figure('Name','Boundary Overlay')
+% BW = boundarymask(Superpixels);
+% imshow(imoverlay(img,BW,'cyan'));
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

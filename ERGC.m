@@ -11,6 +11,9 @@ figure(1)
 subplot(2,2,1)
 imshow(img, [], 'InitialMagnification' ,'fit')
 title('Input Image')
+
+
+
 W = size(img, 1);       % image height
 H = size(img, 2);       % image width
 
@@ -22,6 +25,8 @@ figure(1)
 subplot(2,2,2)
 imshow(Seed_map, [], 'InitialMagnification' ,'fit')
 title('Seed map')
+
+
 
 %display(Seeds)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -52,9 +57,9 @@ Superpixels = 255*ones([size(img, 1), size(img, 2)]);
 [SPs, Superpixels] = initializeSuperpixels(img, Seeds, State_map, Superpixels);
 % display(SPs)
 
-figure(2)
-imshow(Superpixels,[],'InitialMagnification' ,'fit')
-title('Superpixels')
+% figure(2)
+% imshow(Superpixels,[],'InitialMagnification' ,'fit')
+% title('Superpixels')
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
