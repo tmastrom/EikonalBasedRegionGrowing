@@ -37,7 +37,7 @@ end
 %thresh = 2500; % max difference = 50 values
 %thresh = 3600; % max difference = 60 values
 %thresh = 1600; % max difference = 40 values    
-thresh = 200;
+thresh = 50;
 
 while(size(heapL) ~= 0)
     % pop the minimum item off the Heap
@@ -160,7 +160,7 @@ while(size(heapL) ~= 0)
 end
     
 
-mean_map = 256*ones([size(img, 1), size(img, 2)]);
+mean_map = 255*ones([size(img, 1), size(img, 2)]);
 % figure('Name','Superpixels')
 % imshow(Superpixels, [1, 12], 'InitialMagnification' ,'fit')
 
@@ -182,23 +182,26 @@ end
 
 figure('Name','Mean Colour Map')
 imshow(mean_map, [1, 255], 'InitialMagnification' ,'fit');
+imwrite(mean_map, 'bladderseg.png');
 
-figure(1)
-subplot(2,2,3)
-imshow(Superpixels, [1, num_seeds], 'InitialMagnification' ,'fit')
-title('Superpixels')
+% figure(1)
+% subplot(2,2,3)
+% imshow(Superpixels, [1, num_seeds], 'InitialMagnification' ,'fit')
+% title('Superpixels')
+% 
+% figure(1)
+% subplot(2,2,4)
+% Dist = Dist/1e5;
+% imshow(Dist, [], 'InitialMagnification' ,'fit');
+% title('Distance Map')
 
-figure(1)
-subplot(2,2,4)
-Dist = Dist/1e5;
-imshow(Dist, [], 'InitialMagnification' ,'fit');
-title('Distance Map')
 
-imwrite(mean_map, 'Mean_map.jpg')
 
-% figure('Name','Boundary Overlay')
-% BW = boundarymask(Superpixels);
-% imshow(imoverlay(img,BW,'cyan'));
+img = mat2gray(img);
+
+figure('Name','Boundary Overlay')
+BW = boundarymask(mean_map);
+imshow(imoverlay(img,BW,'cyan'),'InitialMagnification' ,'fit');
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
