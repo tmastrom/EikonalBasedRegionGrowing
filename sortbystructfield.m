@@ -1,6 +1,6 @@
 % takes struct array and finds it's minimum value
 % returns the minimum item as well as the array with the minimum removed
-function [minimum, heapL, len] = sortbystructfield(A)
+function [minimum, heapL] = sortbystructfield(A)
 
 for id = 1:length(A)
     fprintf('%d\n',id)

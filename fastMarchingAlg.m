@@ -34,7 +34,7 @@ end
 while(size(heapL) ~= 0)
     % pop the minimum item off the Heap
     
-    [item, heapL, len] = sortbystructfield(heapL);
+    [item, heapL] = sortbystructfield(heapL);
     fprintf('new item from heap\n');
     
     x = item.x; % x position
@@ -127,6 +127,8 @@ while(size(heapL) ~= 0)
                 % update heap len value 
                 heap_len = size(heapL, 2); 
                 
+                
+                % why is this the same for both cases?
                 if State(xx,yy) == 0
                     if A1<Dist(xx,yy)
                         fprintf('State = 0, A1<Dist\n');
@@ -159,12 +161,16 @@ while(size(heapL) ~= 0)
                         heapL(heap_len +1).dist = double(A1);
 
                         Superpixels(xx,yy) = n;
-                        figure(2)
-                        imshow(Superpixels, [], 'InitialMagnification' ,'fit');
+                        %figure(2)
+                        %imshow(Superpixels, [], 'InitialMagnification' ,'fit');
                        
                     end
                     
                 end
+                
+                figure(3)
+                imshow(Dist, [], 'InitialMagnification' ,'fit');
+             
 
             end
 
