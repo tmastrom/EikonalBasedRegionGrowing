@@ -12,6 +12,8 @@ INF = 100000;   % infinity value
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Initialize the Heap with seeds
 length = 1;
+num_seeds = size(Seeds, 2);
+
 for k = 1:size(Seeds, 2)
     xs = double(Seeds(k).x);
     ys = double(Seeds(k).y);
@@ -31,18 +33,27 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % main loop 
 % while there are items on the heap
+
+%thresh = 2500; % max difference = 50 values
+%thresh = 3600; % max difference = 60 values
+%thresh = 1600; % max difference = 40 values    
+thresh = 50;
+
 while(size(heapL) ~= 0)
     % pop the minimum item off the Heap
     
     [item, heapL] = sortbystructfield(heapL);
-    fprintf('new item from heap\n');
+    %fprintf('new item from heap\n');
     
     x = item.x; % x position
     y = item.y; % y position
     n = item.label; % associated seed
-    fprintf('label n: %d \n', n);
-    SPs(n)
+    %fprintf('label n: %d \n', n);
+    %SPs(n)
     
+    % perform threshold operations here
+    % make sure if condition is not met disassociate from superpixel  
+
     % if the point is not COMPUTED
     % point is not fixed 
     if State(x,y) ~= -1      
@@ -80,134 +91,117 @@ while(size(heapL) ~= 0)
 %             
             % if the pixel is in the image 
             if xx<=W && xx>0 && yy<=H && yy>0
-                P = 0;
-                for c = 1:int8(Ci)
-                    P = P + computeDistance(double(c), double(img(xx,yy)));
-                end
-                %fprintf('P = %d \n',P);
                 
-                a1 = INF;
-                if xx<W
-                    a1 = Dist(xx+1, yy);
-                end 
-                if xx>1
-                    a11 = Dist(xx-1, yy);
-                    if a11 < a1
-                        a1 = a11; 
-                    end       
-                end
+                d = computeDistance(double(img(x,y)), double(img(xx,yy)));
                 
-                a2 = INF;
-                if yy<H
-                    a2 = Dist(xx, yy+1);
-                end
-                if yy>1
-                    a22 = Dist(xx, yy-1);
-                    if a22 < a2
-                        a2 = a22;
-                    end
-                end
-                
-                if a1 > a2
-                    tmp = a1;
-                    a1 = a2;
-                    a2 = tmp;
-                end
-                
-                A1 = 0;
-                if P*P > (a2-a1)*(a2-a1)
-                    %fprintf('P*P > (a2-a1)^2 \n');
-                    delta = 2*P*P-(a2-a1)*(a2-a1);
-                    A1 = (a1+a2+sqrt(delta))/2;
-                else
-                    %fprintf('P*P < (a2-a1)^2 \n');
-                    A1 = a1 + P;
-                end
-                
-                % update heap len value 
-                heap_len = size(heapL, 2); 
-                
-                
-                % why is this the same for both cases?
-                if State(xx,yy) == 0
-                    if A1<Dist(xx,yy)
-                        fprintf('State = 0, A1<Dist\n');
-                        Dist(xx,yy) = A1;
-                        
-                        heapL(heap_len +1).x = double(xx);
-                        heapL(heap_len +1).y = double(yy);
-                        heapL(heap_len +1).label = double(n);
-                        
-                        %fprintf('dist: %d \n', d)
-                        heapL(heap_len +1).dist = double(A1);
-                        % update superpixel map 
-                        Superpixels(xx,yy) = n;
-                    end
+                % if distance is below threshold add to the heap 
+                %(50 grayscale values)
+                if d <= thresh               
+                    % update heap len value 
+                    heap_len = size(heapL, 2);
                     
-                else
-                    if State(xx,yy) == 1
-                        % add a new point
-                        %fprintf('State = 1\n')
-                        State(xx,yy) = 0;
-                        Dist(xx,yy) = A1;
-%                         fprintf('Dist(xx,yy) = %d \n',Dist(xx,yy));
-%                         fprintf('A1 = %d \n',A1);
-%                         fprintf('double(A1) = %d \n',double(A1));
-                        heapL(heap_len +1).x = double(xx);
-                        heapL(heap_len +1).y = double(yy);
-                        heapL(heap_len +1).label = double(n);
-                        
-                        %fprintf('dist: %d \n', d)
-                        heapL(heap_len +1).dist = double(A1);
+                    % why is this the same for both cases?
+                    if State(xx,yy) == 0
+                        % if the new distance is less than the current
+                        % distance
+                        if d<Dist(xx,yy)
+                            
+                            Dist(xx,yy) = d;
 
-                        Superpixels(xx,yy) = n;
-                        %figure(2)
-                        %imshow(Superpixels, [], 'InitialMagnification' ,'fit');
-                       
-                    end
+                            heapL(heap_len +1).x = double(xx);
+                            heapL(heap_len +1).y = double(yy);
+                            heapL(heap_len +1).label = double(n);
+
+                            %fprintf('dist: %d \n', d)
+                            heapL(heap_len +1).dist = double(d);
+                            % update superpixel map 
+                            Superpixels(xx,yy) = n;
+                        end
+
+                    else
+                        if State(xx,yy) == 1
+                            % add a new point
+                            %fprintf('State = 1\n')
+                            State(xx,yy) = 0;
+                            Dist(xx,yy) = d;
+    %                         fprintf('Dist(xx,yy) = %d \n',Dist(xx,yy));
+    %                         fprintf('A1 = %d \n',A1);
+    %                         fprintf('double(A1) = %d \n',double(A1));
+                            heapL(heap_len +1).x = double(xx);
+                            heapL(heap_len +1).y = double(yy);
+                            heapL(heap_len +1).label = double(n);
+
+                            %fprintf('dist: %d \n', d)
+                            heapL(heap_len +1).dist = double(d);
+
+                            Superpixels(xx,yy) = n;
+                            %figure(2)
+                            %imshow(Superpixels, [], 'InitialMagnification' ,'fit');
+
+                        end
+
+                    end  
+                else % distance greater than threshold
                     
+                    %disp('distance greater than threshold');
+                    % do nothing
                 end
-                
-                figure(3)
-                imshow(Dist, [], 'InitialMagnification' ,'fit');
-             
-
+          
             end
-
+            
+            % live update the state map
+            figure(2)  
+            imshow(State, [], 'InitialMagnification' ,'fit');
+  
         end
+
     end
     
-
 end
+    
 
-mean_map = 256*ones([size(img, 1), size(img, 2)]);
-figure(2)
-imshow(Superpixels, [], 'InitialMagnification' ,'fit')
+mean_map = 255*ones([size(img, 1), size(img, 2)]);
+% figure('Name','Superpixels')
+% imshow(Superpixels, [1, 12], 'InitialMagnification' ,'fit')
+
 
 for q = 1:W
     for p = 1:H
+        
         ind = Superpixels(q,p);
         %fprintf('index %d\n',ind);
-        %if ind <= max(size(SPs))
-            
-        mean_map(q,p) = uint8(SPs(ind).meanColour);
-        %else 
+        if ind <= max(size(SPs))
+            mean_map(q,p) = uint8(SPs(ind).meanColour);
+        else 
             %disp('not associated with a Superpixel')
-        %end
+        end
         
         
     end
 end
-figure(1)
-subplot(2,2,3)
-imshow(mean_map, [1, 255], 'InitialMagnification' ,'fit');
-title('Mean Colour Map')
 
-figure(1)
-subplot(2,2,4)
-Dist = Dist/1e5;
-imshow(Dist, [], 'InitialMagnification' ,'fit');
-title('Distance Map')
+figure('Name','Mean Colour Map')
+imshow(mean_map, [1, 255], 'InitialMagnification' ,'fit');
+imwrite(mean_map, 'bladderseg.png');
+
+% figure(1)
+% subplot(2,2,3)
+% imshow(Superpixels, [1, num_seeds], 'InitialMagnification' ,'fit')
+% title('Superpixels')
+% 
+% figure(1)
+% subplot(2,2,4)
+% Dist = Dist/1e5;
+% imshow(Dist, [], 'InitialMagnification' ,'fit');
+% title('Distance Map')
+
+
+
+img = mat2gray(img);
+
+figure('Name','Boundary Overlay')
+BW = boundarymask(mean_map);
+imshow(imoverlay(img,BW,'cyan'),'InitialMagnification' ,'fit');
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

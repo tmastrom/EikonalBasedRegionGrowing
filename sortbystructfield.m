@@ -2,10 +2,10 @@
 % returns the minimum item as well as the array with the minimum removed
 function [minimum, heapL] = sortbystructfield(A)
 
-for id = 1:length(A)
-    fprintf('%d\n',id)
-    %disp(A(id))
-end
+% for id = 1:length(A)
+%     %fprintf('%d\n',id)
+%     %disp(A(id))
+% end
 
 Afields = fieldnames(A);
 Acell = struct2cell(A);
@@ -40,7 +40,7 @@ for i = 2:length(Asorted)
 end
 Asorted(length(Asorted)) = [];
 heapL = Asorted;
-len = length(heapL);
+%len = length(heapL);
 % delete from array 
 
 
