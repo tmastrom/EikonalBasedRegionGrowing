@@ -1,10 +1,10 @@
-function [Superpixels] = fastMarchingAlg(Dist, Seeds, State, img, SPs, Superpixels, Seed_map)
+function [Superpixels] = fastMarchingAlg(Dist, Seeds, State, img, SPs, Superpixels, Seed_map, T)
 
 INF = 100000;           % infinity value 
 W = size(img, 1);       % image height
 H = size(img, 2);       % image width
 
-thresh = 200;       % TODO make this a parameter to be chosen by user
+       % TODO make this a parameter to be chosen by user
 
 
 % Initialize the Heap with seeds
@@ -14,6 +14,9 @@ heapL = struct('x', 0, 'y', 0, 'label',1 ,'dist', 0);
 length = 1;
 num_seeds = size(Seeds, 2);
 
+
+fprintf('Time to initialize Heap')
+tic 
 for k = 1:size(Seeds, 2)
     xs = double(Seeds(k).x);
     ys = double(Seeds(k).y);
@@ -28,11 +31,16 @@ for k = 1:size(Seeds, 2)
     length = length + 1;
 end
 % end heap initialization
-
+toc
 %
 % main loop 
 %  
+tic
+counter = 0;
 while(size(heapL) ~= 0)
+    
+    % update counter 
+    counter = counter + 1;
     
     % pop the minimum item off the Heap
     [item, heapL] = sortbystructfield(heapL);
@@ -57,7 +65,6 @@ while(size(heapL) ~= 0)
         SPs(n).count = Ni;
         % add pixel to superpixel map with intensity 'label'
         Superpixels(x,y) = n; 
-
  
         % investigate 4-conn neighbourhood to find the next closest pixel         
         v4x = [-1 0 1 0];   % 4connexity neighbourhood x 
@@ -76,7 +83,7 @@ while(size(heapL) ~= 0)
                 d = (c1 - c2)*(c1 - c2);
                 
                 % if distance is below threshold add to the heap 
-                if d <= thresh               
+                if d <= T               
                     % update heap len value 
                     heap_len = size(heapL, 2);
 
@@ -114,16 +121,41 @@ while(size(heapL) ~= 0)
                     % do nothing
                 end
             end
+            
+            % file path to save to 
+            Results = 'C:\Users\T\Documents\MATLAB\435\Growing';
             % live update the state map
-            figure(2)  
-            imshow(State, [], 'InitialMagnification' ,'fit');
+            if mod(counter, 4) == 0
+                
+                % Uncomment this to observe live region growing
+                % this negatively effects computation time significantly 
+
+                % figure(2)  
+                img1 = mat2gray(img); 
+                BW = imbinarize(Superpixels, 250);
+                BW1 = imcomplement(BW);
+                BW2 = bwperim(BW1, 8);
+                g = imoverlay(img1,BW2,'cyan');
+                % imshow(g,'InitialMagnification' ,'fit');
+                
+                % write image to file 
+                baseFileName = sprintf('%d.png', counter); % e.g. "1.png"
+                fullFileName = fullfile(Results, baseFileName); % No need to worry about slashes now!
+                imwrite(g, fullFileName);
+
+            end
+            
+
+            
+            
         end
 
     end
     
 end
 % end main loop 
-
+toc
+fprintf('Counter = %d \n',counter)
     
 %
 % Create the Mean Colour Map
@@ -141,7 +173,6 @@ for q = 1:W
         else 
             %disp('not associated with a Superpixel')
         end
-        
         
     end
 end

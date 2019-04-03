@@ -7,6 +7,7 @@ v4y = [0 1 0 -1];   % 4connexity neighbourhood y
 % initialize Superpixel struct 
 SPs = struct('x',[], 'y', [], 'meanColour', [], 'count', [], 'label',[]); 
 
+
 % compute meanColour based on 4 connexity neighbourhood
 for k=1:size(Seeds, 2)
     
@@ -33,7 +34,6 @@ for k=1:size(Seeds, 2)
    SPs(k).meanColour = mean(fourcon); 
    Superpixels(x,y) = k;
 end
-
 
 end
 

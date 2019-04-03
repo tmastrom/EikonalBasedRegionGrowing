@@ -1,8 +1,12 @@
 % ERGC main function 
 % img = input image
-% K = number of seeds 
+% T = threshold
+% the squared difference in pixel colour for a pixel to be added to a region
+% for best results T = around 200
 
-function ERGC(img, K)
+function ERGC(img, T)
+
+tic
 
 close all
 
@@ -43,7 +47,7 @@ Superpixels = 255*ones([size(img, 1), size(img, 2)]);
 [SPs, Superpixels] = initializeSuperpixels(img, Seeds, State_map, Superpixels);
 
 % Perform Fast Marching Algorithm
-fastMarchingAlg(Dist_map, Seeds, State_map, img, SPs, Superpixels, Seed_map);
+fastMarchingAlg(Dist_map, Seeds, State_map, img, SPs, Superpixels, Seed_map, T);
 
-
+toc 
        
